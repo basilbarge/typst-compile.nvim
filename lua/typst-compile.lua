@@ -17,10 +17,9 @@ local format_picker = function(opts)
 	}):find()
 end
 
-format_picker()
+format_picker((require "telescope.themes").get_dropdown())
 
 M.setup = function()
-
 end
 
 return M
