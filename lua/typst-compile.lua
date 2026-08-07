@@ -30,7 +30,9 @@ end
 
 --format_picker((require "telescope.themes").get_dropdown())
 
-local compile_typst = function(file_path)
+local generate_command = function(file_path)
+	local cmd = "typst compile"
+
 	local path = file_path or vim.fn.expand("%")
 	local extension = path:match("^.+(%..+)$")
 
@@ -39,17 +41,17 @@ local compile_typst = function(file_path)
 		return
 	end
 
-	--local cmd = {}
-	--for w in string.gmatch("typst compile" .. " " .. path, "([^" .. "%s" .. "]+)") do
-	--	table.insert(cmd, w)
-	--end
+	cmd = cmd .. " " .. path
 
-	vim.cmd("!typst compile " .. path)
+	return cmd
 end
 
-compile_typst("test.typ")
 
 M.setup = function()
+	vim.api.nvim_create_user_command("TypstCompile", function()
+		local cmd = generate_command()
+		vim.cmd(cmd)
+	end, {})
 end
 
 return M
