@@ -30,18 +30,24 @@ end
 
 --format_picker((require "telescope.themes").get_dropdown())
 
-local call_command = function()
-	local cmd = {}
-	for w in string.gmatch("touch test.txt", "([^" .. "%s" .. "]+)") do
-		table.insert(cmd, w)
+local compile_typst = function(file_path)
+	local path = file_path or vim.fn.expand("%")
+	local extension = path:match("^.+(%..+)$")
+
+	if extension ~= ".typ" then
+		print("The current file is not a typst file")
+		return
 	end
 
-	local obj = vim.system(cmd)
+	--local cmd = {}
+	--for w in string.gmatch("typst compile" .. " " .. path, "([^" .. "%s" .. "]+)") do
+	--	table.insert(cmd, w)
+	--end
 
-	print(vim.inspect(obj))
+	vim.cmd("!typst compile " .. path)
 end
 
-call_command()
+compile_typst("test.typ")
 
 M.setup = function()
 end
