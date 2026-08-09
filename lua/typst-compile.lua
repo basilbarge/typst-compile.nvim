@@ -15,7 +15,7 @@ local generate_command = function(opts)
 	local extension = path:match("^.+(%..+)$")
 
 	if extension ~= ".typ" then
-		print("The current file is not a typst file")
+		vim.notify("The current file is not a typst file")
 		return
 	end
 
