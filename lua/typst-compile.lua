@@ -8,21 +8,16 @@ local M = {}
 
 local compile_formats = { "pdf", "png", "svg", "html", "bundle" }
 
-
-
 local generate_command = function(opts)
 	local cmd = "typst compile"
 
 	local path = opts.file_path or vim.fn.expand("%")
 	local extension = path:match("^.+(%..+)$")
 
-	print("path", path)
-	print("extension", extension)
-
-	--if extension ~= ".typ" then
-	--	print("The current file is not a typst file")
-	--	return
-	--end
+	if extension ~= ".typ" then
+		print("The current file is not a typst file")
+		return
+	end
 
 	local format = opts.format or "pdf"
 
@@ -44,16 +39,20 @@ local format_picker = function(opts)
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
 				local gen_opts = {
-					file_path = "",
-					format = selection
+					file_path = nil,
+					format = selection[1]
 				}
-				generate_command(gen_opts)
+				local typst_cmd = generate_command(gen_opts)
+
+				if typst_cmd ~= nil then
+					local cmd = "silent :!" .. typst_cmd
+					vim.cmd(cmd)
+				end
 			end)
 			return true
 		end
 	}):find()
 end
-
 
 M.setup = function()
 	vim.api.nvim_create_user_command("TypstCompile", function()
