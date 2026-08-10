@@ -29,9 +29,11 @@ local generate_command = function(opts)
 	return cmd
 end
 
-local format_picker = function(opts)
+M.compile = function(opts)
 	opts = opts or {}
-	pickers.new(opts.theme, {
+
+	local dropdown = require "telescope.themes".get_dropdown()
+	pickers.new(dropdown, {
 		prompt_title = "Formats",
 		finder = finders.new_table {
 			results = compile_formats
@@ -46,8 +48,13 @@ local format_picker = function(opts)
 						input = nil
 					end
 
+					local file_path = nil
+					if opts.args ~= nil then
+						file_path = opts.args[1]
+					end
+
 					local gen_opts = {
-						file_path = opts.args[1],
+						file_path = file_path,
 						format = selection[1],
 						compiled_name = input
 					}
