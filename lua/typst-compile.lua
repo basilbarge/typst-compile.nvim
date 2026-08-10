@@ -13,6 +13,7 @@ local generate_command = function(opts)
 
 	local path = opts.file_path or vim.fn.expand("%")
 	local extension = path:match("^.+(%..+)$")
+	local path_head = path:match("(.*/)") or path:match("(.*\\)") or ""
 
 	if extension ~= ".typ" then
 		vim.notify("The current file is not a typst file")
@@ -22,7 +23,7 @@ local generate_command = function(opts)
 	local format = opts.format or "pdf"
 	local compiled_name = opts.compiled_name or vim.fn.expand("%:r")
 
-	cmd = cmd .. " " .. path .. " " .. compiled_name .. "." .. format
+	cmd = cmd .. " " .. path .. " " .. path_head .. compiled_name .. "." .. format
 
 	print(vim.inspect(cmd))
 	return cmd
@@ -30,6 +31,7 @@ end
 
 local format_picker = function(opts)
 	opts = opts or {}
+	pickers.new(opts.theme, {
 		prompt_title = "Formats",
 		finder = finders.new_table {
 			results = compile_formats
@@ -45,7 +47,7 @@ local format_picker = function(opts)
 					end
 
 					local gen_opts = {
-						file_path = nil,
+						file_path = opts.args[1],
 						format = selection[1],
 						compiled_name = input
 					}
@@ -64,9 +66,9 @@ local format_picker = function(opts)
 end
 
 M.setup = function()
-	vim.api.nvim_create_user_command("TypstCompile", function()
-		format_picker((require "telescope.themes").get_dropdown())
-	end, {})
+	vim.api.nvim_create_user_command("TypstCompile", function(opts)
+		format_picker({ theme = (require "telescope.themes").get_dropdown(), args = opts.fargs })
+	end, { nargs = "?" })
 end
 
 return M
