@@ -74,7 +74,7 @@ end
 
 M.setup = function()
 	vim.api.nvim_create_user_command("TypstCompile", function(opts)
-		format_picker({ theme = (require "telescope.themes").get_dropdown(), args = opts.fargs })
+		M.compile({ args = opts.fargs })
 	end, { nargs = "?" })
 end
 
