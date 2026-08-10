@@ -20,15 +20,16 @@ local generate_command = function(opts)
 	end
 
 	local format = opts.format or "pdf"
+	local compiled_name = opts.compiled_name or vim.fn.expand("%:r")
 
-	cmd = cmd .. " " .. path .. " -f " .. format
+	cmd = cmd .. " " .. path .. " " .. compiled_name .. "." .. format
 
+	print(vim.inspect(cmd))
 	return cmd
 end
 
 local format_picker = function(opts)
 	opts = opts or {}
-	pickers.new(opts, {
 		prompt_title = "Formats",
 		finder = finders.new_table {
 			results = compile_formats
@@ -38,16 +39,24 @@ local format_picker = function(opts)
 			actions.select_default:replace(function()
 				actions.close(prompt_bufnr)
 				local selection = action_state.get_selected_entry()
-				local gen_opts = {
-					file_path = nil,
-					format = selection[1]
-				}
-				local typst_cmd = generate_command(gen_opts)
+				vim.ui.input({ prompt = "Enter new file name: " }, function(input)
+					if input == "" then
+						input = nil
+					end
 
-				if typst_cmd ~= nil then
-					local cmd = "silent :!" .. typst_cmd
-					vim.cmd(cmd)
-				end
+					local gen_opts = {
+						file_path = nil,
+						format = selection[1],
+						compiled_name = input
+					}
+
+					local typst_cmd = generate_command(gen_opts)
+
+					if typst_cmd ~= nil then
+						local cmd = "silent :!" .. typst_cmd
+						vim.cmd(cmd)
+					end
+				end)
 			end)
 			return true
 		end
